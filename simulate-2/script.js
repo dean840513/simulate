@@ -262,7 +262,7 @@ function showOrders() {
         </li>
       `).join('');
 
-    animateSwitch(["nftOverlay", "paymentResult", "nftListView", "title"], ["ordersView"]);
+    animateSwitch(["nftOverlay", "myNFTView", "paymentResult", "nftListView", "title"], ["ordersView"]);
 }
 
 

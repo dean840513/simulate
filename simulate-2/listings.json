@@ -78,25 +78,5 @@
         "value": "2021"
       }
     ]
-  },
-  {
-    "tokenId": 5,
-    "name": "酒款 #5",
-    "description": "这是一款优质红酒 #5",
-    "image": "jpg/wine5.jpg",
-    "price": 35.72,
-    "stock": 8,
-    "status": 1,
-    "createdAt": 1716865000,
-    "attributes": [
-      {
-        "trait_type": "产区",
-        "value": "宁夏贺兰山"
-      },
-      {
-        "trait_type": "年份",
-        "value": "2022"
-      }
-    ]
   }
 ]
