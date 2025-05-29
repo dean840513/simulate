@@ -1,0 +1,46 @@
+<div class="detail-page">
+    <div class="detail-header">
+        <h2>🏪 寄售酒 NFT</h2>
+        <button onclick="window.showMain()" class="close-button">✖</button>
+    </div>
+
+    <div class="detail-body">
+        <p>你当前持有的酒 NFT 数量：<span id="myWineCount">0</span></p>
+        <p>💰 你当前的收益：<span id="myIncome">0</span> USDT</p>
+        <h3>📦 寄售酒 NFT</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input id="consignAmount" type="number" min="1" value="1" style="flex: 1; padding: 6px;" />
+            <button id="maxConsign" class="max-button">Max</button>
+        </div>
+        <button id="consignButton" class="primary-button">寄售酒 NFT</button>
+        <button onclick="window.showMain()" class="secondary-button">🏠 返回主页</button>
+
+        <h3 style="margin-top: 30px;">当前寄售队列：</h3>
+        <ul id="consignList" style="list-style-type: none; padding-left: 0;"></ul>
+    </div>
+</div>
+</div>
+
+<style>
+    .detail-page {
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        max-width: 500px;
+        margin: 20px auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .close-button {
+        font-size: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+</style>

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>葡萄酒NFT模拟平台</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #detailView,
+        #mainView {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>葡萄酒 NFT 模拟</h1>
+        <div class="wallet-info">
+            <div class="wallet-row">
+                <button id="connectBtn" class="primary-button">🎲 模拟连接钱包</button>
+                <span id="walletAddress" style="display:none;"></span>
+            </div>
+            <div class="wallet-row">
+                <span id="grapeBalance" style="display:none;">🍇 我的葡萄：0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="hero">
+        <h2>欢迎来到链上酿酒模拟平台</h2>
+        <p>体验从购买葡萄到寄售酒款的完整流程</p>
+    </div>
+
+    <div class="grid" id="mainView">
+        <div class="card" onclick="loadDetail('buy.html')">
+            <img src="grapes.png" alt="购买葡萄" />
+            <h3>🍇 购买葡萄</h3>
+            <button class="primary-button">立即购买</button>
+        </div>
+
+        <div class="card" onclick="loadDetail('vote.html')">
+            <img src="vote.png" alt="酿造投票" />
+            <h3>🗳️ 酿造投票</h3>
+            <button class="primary-button">投票</button>
+        </div>
+
+        <div class="card" onclick="loadDetail('redeem.html')">
+            <img src="wine.png" alt="兑换葡萄酒" />
+            <h3>🍷 领取葡萄酒</h3>
+            <button class="primary-button">兑换酒NFT</button>
+        </div>
+
+        <div class="card" onclick="loadDetail('consign.html')">
+            <img src="store.png" alt="寄售" />
+            <h3>🏪 寄售酒NFT</h3>
+            <button class="primary-button">寄售一瓶酒</button>
+        </div>
+    </div>
+
+    <div class="section" id="detailView" style="display: none;"></div>
+
+    <div id="walletOverlay" style="display: none;" class="wallet-overlay">
+        <div class="wallet-dialog">
+            <div class="spinner"></div>
+            <p>正在与钱包交互，请稍候...</p>
+        </div>
+    </div>
+
+    <div style="margin: 40px auto; text-align: center;">
+        <button onclick="loadDetail('admin.html')" class="secondary-button">🧾 管理员分账模拟</button>
+    </div>
+
+
+    <script>
+        let users = {}, currentUser = null, queue = [], nftId = 1;
+
+        function connectWallet() {
+            const random = '0x' + [...Array(40)].map(() => Math.floor(Math.random() * 16).toString(16)).join('');
+            if (!users[random]) users[random] = { grapes: 0, locked: 0, wineNFTs: [], usdt: 0 };
+            currentUser = random;
+            let shortAddr = `${random.slice(0, 6)}...${random.slice(-4)}`;
+            document.getElementById("walletAddress").innerText = `钱包地址：${shortAddr}`;
+            document.getElementById("walletAddress").style.display = 'inline';
+            document.getElementById("grapeBalance").style.display = 'inline';
+            updateUI();
+            document.getElementById("connectBtn").style.display = 'none';
+            localStorage.setItem("currentUser", currentUser);
+        }
+
+        function updateUI() {
+            document.getElementById("grapeBalance").innerText = `🍇 我的葡萄：${users[currentUser].grapes}｜🔒 已锁定：${users[currentUser].locked}`;
+        }
+
+        document.getElementById("connectBtn").onclick = connectWallet;
+
+        window.onload = () => {
+            const saved = localStorage.getItem("currentUser");
+            if (saved) {
+                currentUser = saved;
+                if (!users[currentUser]) users[currentUser] = { grapes: 0, locked: 0, wineNFTs: [], usdt: 0 };
+                // users[currentUser].grapes = 1000;
+                // users[currentUser].locked = 500;
+                let shortAddr = `${currentUser.slice(0, 6)}...${currentUser.slice(-4)}`;
+                document.getElementById("walletAddress").innerText = `钱包地址：${shortAddr}`;
+                document.getElementById("walletAddress").style.display = 'inline';
+                document.getElementById("grapeBalance").style.display = 'inline';
+                updateUI();
+                document.getElementById("connectBtn").style.display = 'none';
+            }
+
+            const lastPage = localStorage.getItem("lastPage");
+            if (lastPage) {
+                loadDetail(lastPage, false);
+            }
+
+            window.addEventListener("popstate", () => {
+                const current = history.state?.page;
+                if (current) loadDetail(current, false);
+                else showMain();
+            });
+        };
+
+        function loadDetail(filename, push = true) {
+            fetch(filename)
+                .then(res => res.text())
+                .then(html => {
+                    document.getElementById("mainView").style.display = 'none';
+                    document.getElementById("detailView").innerHTML = html;
+                    document.getElementById("detailView").style.display = 'block';
+                    if (push) history.pushState({ page: filename }, '', '#' + filename);
+                    localStorage.setItem("lastPage", filename);
+                    if (filename === 'redeem.html') {
+                        setTimeout(() => renderNFTList(), 0);
+                    }
+                    if (filename === 'consign.html') {
+                        setTimeout(() => renderConsignPage(), 0);
+                    }
+                    if (filename === 'vote.html') {
+                        setTimeout(() => {
+                            if (users[currentUser]?.voted) {
+                                renderVoteSuccess();
+                            }
+                        }, 0);
+
+                    }
+                });
+        }
+
+        function showMain() {
+            document.getElementById("detailView").style.display = 'none';
+            document.getElementById("mainView").style.display = 'grid';
+            history.pushState({}, '', location.pathname);
+            localStorage.removeItem("lastPage");
+        }
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.id === "buyButton") {
+                const amt = parseInt(document.getElementById("buyAmount").value);
+                if (isNaN(amt) || amt <= 0) return alert("请输入有效的购买数量");
+
+                const status = document.getElementById("buyStatus");
+                const confirmed = confirm(`确认要购买 ${amt} 颗葡萄吗？`);
+                if (!confirmed) return;
+                showWalletOverlay(); // 显示加载弹窗
+
+                setTimeout(() => {
+                    users[currentUser].grapes += amt;
+                    status.innerHTML = `
+                        ✅ 成功购买 ${amt} 颗葡萄！<br>
+                        <a href="#" onclick="loadDetail('vote.html'); return false;" style="color: #4caf50; text-decoration: underline;">
+                            👉 点击去投票酿造
+                        </a>
+                        `;
+                    updateUI();
+                    hideWalletOverlay(); // 隐藏弹窗
+                }, 1000);
+            }
+        });
+
+        let voteSelections = {
+            type: null,
+            country: null,
+            region: null,
+            oak: null,
+            price: null
+        };
+
+        // 点击选项卡绑定逻辑
+        document.addEventListener("click", function (e) {
+            if (e.target.classList.contains("option") && !e.target.classList.contains("disabled")) {
+                const group = e.target.closest(".option-row");
+                const field = group.dataset.field;
+                if (!field) return;
+
+                // 清除同组其他按钮 active 状态
+                [...group.querySelectorAll(".option")].forEach(btn => btn.classList.remove("active"));
+                e.target.classList.add("active");
+                voteSelections[field] = e.target.dataset.value;
+                updateVoteSummary();
+            }
+        });
+
+        // 汇总展示函数
+        function updateVoteSummary() {
+            const summary = document.getElementById("voteSummary");
+            if (!summary) return;
+            summary.innerHTML = `
+            <li>🍷 类型：${voteSelections.type || "未选择"}</li>
+            <li>🌍 国家：${voteSelections.country || "未选择"}</li>
+            <li>📍 产区：${voteSelections.region || "未选择"}</li>
+            <li>🪵 橡木桶：${voteSelections.oak || "未选择"}</li>
+            <li>💰 期望售价：${voteSelections.price || "未选择"}</li>
+            `;
+        }
+
+        // 确认投票按钮逻辑
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.id === "voteButton") {
+                const user = users[currentUser];
+                const voteInput = document.getElementById("voteAmount");
+                const amount = parseInt(voteInput?.value || "0");
+
+                if (!amount || amount < 100 || amount % 100 !== 0) {
+                    return alert("请输入 100 的倍数的葡萄数量进行投票");
+                }
+
+                if (user.grapes < amount) {
+                    return alert(`🍇 你只有 ${user.grapes} 颗葡萄，无法投 ${amount}`);
+                }
+
+                const fields = Object.entries(voteSelections);
+                const unfilled = fields.filter(([_, v]) => !v);
+                if (unfilled.length > 0) return alert("请先完成所有投票项选择");
+
+                const confirmMsg =
+                    `确认投票如下：\n` +
+                    fields.map(([k, v]) => `${k}：${v}`).join('\n') +
+                    `\n将消耗 ${amount} 颗葡萄，是否继续？`;
+
+                if (!confirm(confirmMsg)) return;
+
+                showWalletOverlay();
+                setTimeout(() => {
+                    user.grapes -= amount;
+                    user.locked += amount;
+                    user.voted = true; // ✅ 设置为已投票
+                    updateUI();
+                    hideWalletOverlay();
+                    renderVoteSuccess(); // ✅ 显示投票成功状态
+                }, 1000);
+            }
+        });
+
+        function renderVoteSuccess() {
+            const body = document.querySelector(".detail-body");
+            if (!body) return;
+
+            const user = users[currentUser];
+            body.innerHTML = `
+                <p style="font-size:16px; color: green; margin-bottom: 10px;">
+                ✅ 你已成功投票，当前已锁定 ${user.locked} 颗葡萄
+                <br>📅 投票结束时间：2026/1/1
+                </p>
+
+                <h3>🍇 追加投票葡萄</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                <input id="extraVoteAmount" type="number" min="100" step="100" value="100" style="flex:1; padding: 8px;" />
+                <button id="maxExtraVote" class="max-button">Max</button>
+                </div>
+                <button id="extraVoteButton" class="primary-button">➕ 确认追加</button>
+                <button onclick="window.showMain()" class="secondary-button">🏠 返回主页</button>
+
+                <p style="font-size: 12px; color: #555; margin-top: 10px;">
+                提示：追加的葡萄将使用原投票选项，不能修改。
+                </p>
+
+                <button id="mockEndButton" class="secondary-button" style="margin-top: 20px;">🧪 模拟投票结束</button>
+            `;
+        }
+
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.id === "mockEndButton") {
+                const body = document.querySelector(".detail-body");
+                if (!body) return;
+                body.innerHTML = `
+                    <p style="font-size:16px; color: green;">
+                        🏁 投票已结束，你可前往领取酒 NFT。
+                    </p>
+                    <button onclick="loadDetail('redeem.html')" class="primary-button" style="margin-top: 10px;">
+                        🍷 去领取 NFT
+                    </button>
+                    `;
+            }
+        });
+
+        document.addEventListener("click", function (e) {
+            // Max 按钮填充剩余可投葡萄
+            if (e.target && e.target.id === "maxExtraVote") {
+                const input = document.getElementById("extraVoteAmount");
+                const max = Math.floor(users[currentUser].grapes / 100) * 100;
+                if (input) input.value = max > 0 ? max : 100;
+            }
+
+            // 追加按钮执行逻辑
+            if (e.target && e.target.id === "extraVoteButton") {
+                const input = document.getElementById("extraVoteAmount");
+                const amount = parseInt(input?.value || "0");
+                const user = users[currentUser];
+
+                if (!amount || amount < 100 || amount % 100 !== 0) {
+                    return alert("请输入 100 的倍数的葡萄数量进行追加");
+                }
+                if (user.grapes < amount) {
+                    return alert(`🍇 你只有 ${user.grapes} 颗葡萄，无法追加 ${amount}`);
+                }
+
+                if (!confirm(`确认要追加 ${amount} 颗葡萄用于当前投票选项？`)) return;
+
+                showWalletOverlay();
+                setTimeout(() => {
+                    user.grapes -= amount;
+                    user.locked += amount;
+                    updateUI();
+                    hideWalletOverlay();
+                    renderVoteSuccess();
+                }, 1000);
+            }
+        });
+
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.id === "maxVote") {
+                const input = document.getElementById("voteAmount");
+                const max = Math.floor(users[currentUser].grapes / 100) * 100;
+                if (input) input.value = max > 0 ? max : 100;
+            }
+        });
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.id === "redeemButton") {
+                const user = users[currentUser];
+                const count = Math.floor(user.locked / 100);
+                if (count === 0) return alert("🔒 没有足够锁定的葡萄可兑换酒 NFT");
+
+                if (!confirm(`你将兑换 ${count} 瓶葡萄酒 NFT，是否继续？`)) return;
+
+                showWalletOverlay();
+                setTimeout(() => {
+                    for (let i = 0; i < count; i++) {
+                        user.wineNFTs.push(nftId++);
+                    }
+                    user.locked -= count * 100;
+                    updateUI();
+                    renderNFTList();
+                    hideWalletOverlay();
+                    const result = document.getElementById("redeemResult");
+                    if (result) {
+                        result.innerHTML = `
+                            ✅ 成功领取 ${count} 瓶 NFT！<br>
+                            👉 <a href="#" onclick="loadDetail('consign.html'); return false;" style="color: #4caf50; text-decoration: underline;">
+                            需要寄售？点击去寄售
+                            </a>
+                        `;
+                    }
+                }, 1000);
+            }
+        });
+
+        function renderNFTList() {
+            const list = document.getElementById("nftList");
+            if (!list) return;
+            list.innerHTML = "";
+            users[currentUser].wineNFTs.forEach(id => {
+                const li = document.createElement("li");
+                li.textContent = `NFT #${id}`;
+                list.appendChild(li);
+            });
+
+            const lockedEl = document.getElementById("lockedGrapes");
+            if (lockedEl) lockedEl.innerText = users[currentUser].locked;
+        }
+
+        function renderConsignPage() {
+            if (!document.getElementById("consignList")) return;
+            document.getElementById("myWineCount").innerText = users[currentUser].wineNFTs.length;
+
+            const list = document.getElementById("consignList");
+            list.innerHTML = "";
+            queue.forEach((item, i) => {
+                const li = document.createElement("li");
+                const isSelf = item.user === currentUser;
+                const shortAddr_consign = `${item.user.slice(0, 6)}...${item.user.slice(-4)}`;
+                li.textContent = `${i + 1}. ${isSelf ? "🧍‍♂️ " : ""}${shortAddr_consign}${item.paid ? " ✅已售" : ""}`;
+
+                list.appendChild(li);
+            });
+
+            const incomeEl = document.getElementById("myIncome");
+            if (incomeEl) incomeEl.innerText = users[currentUser].usdt || 0;
+        }
+
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.id === "consignButton") {
+                const input = document.getElementById("consignAmount");
+                let count = parseInt(input?.value || "0");
+                const user = users[currentUser];
+                const available = user.wineNFTs.length;
+
+                if (isNaN(count) || count <= 0) return alert("请输入有效寄售数量");
+                if (count > available) return alert(`你只有 ${available} 瓶酒 NFT 可寄售`);
+
+                if (!confirm(`是否寄售 ${count} 瓶葡萄酒？`)) return;
+
+                showWalletOverlay();
+                setTimeout(() => {
+                    for (let i = 0; i < count; i++) {
+                        const nft = user.wineNFTs.pop();
+                        queue.push({ user: currentUser, nft, paid: false });
+                    }
+                    updateUI();
+                    renderConsignPage();
+                    hideWalletOverlay();
+                    alert(`✅ 已成功寄售 ${count} 瓶酒 NFT`);
+                }, 1000);
+            }
+        });
+
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.id === "maxConsign") {
+                const input = document.getElementById("consignAmount");
+                if (input) input.value = users[currentUser].wineNFTs.length;
+            }
+        });
+
+
+
+
+
+
+
+        function showWalletOverlay() {
+            document.getElementById("walletOverlay").style.display = "flex";
+        }
+
+        function hideWalletOverlay() {
+            document.getElementById("walletOverlay").style.display = "none";
+        }
+
+
+
+        document.addEventListener("click", function (e) {
+            if (e.target && e.target.id === "settleButton") {
+                const sold = parseInt(document.getElementById("soldCount").value);
+                const revenue = parseInt(document.getElementById("revenue").value);
+                if (isNaN(sold) || isNaN(revenue) || sold <= 0 || revenue <= 0) {
+                    return alert("请输入有效的瓶数与收入");
+                }
+
+                const unsoldCount = queue.filter(item => !item.paid).length;
+                if (sold > unsoldCount) {
+                    return alert(`当前尚未售出的 NFT 仅有 ${unsoldCount} 瓶，无法结算 ${sold} 瓶`);
+                }
+
+                // ⚠️ 弹窗确认前不执行实际操作
+                if (!confirm(`将要分发收益，是否确认执行分账？`)) return;
+
+                const unit = Math.floor(revenue / sold);
+                let paid = 0;
+                for (let i = 0; i < queue.length && paid < sold; i++) {
+                    const item = queue[i];
+                    if (!item.paid) {
+                        users[item.user].usdt = (users[item.user].usdt || 0) + unit;
+                        item.paid = true;
+                        paid++;
+                    }
+                }
+
+                updateUI?.();
+                renderConsignPage?.();
+                alert(`✅ 分账完成，共发放 ${paid} 份，每份 ${unit} USDT`);
+            }
+        });
+
+        document.addEventListener("input", function (e) {
+            const sold = parseInt(document.getElementById("soldCount")?.value || "0");
+            const unit = parseFloat(document.getElementById("unitPrice")?.value || "0");
+            const revenue = parseFloat(document.getElementById("revenue")?.value || "0");
+
+            // 修改单价时，自动更新总收入
+            if (e.target.id === "unitPrice" && sold > 0) {
+                document.getElementById("revenue").value = (unit * sold).toFixed(2);
+            }
+
+            // 修改总收入时，自动更新单价
+            if (e.target.id === "revenue" && sold > 0) {
+                document.getElementById("unitPrice").value = (revenue / sold).toFixed(2);
+            }
+
+            // 修改售出数量时，根据已有的单价或收入更新另一个
+            if (e.target.id === "soldCount") {
+                if (unit > 0) {
+                    document.getElementById("revenue").value = (unit * sold).toFixed(2);
+                } else if (revenue > 0) {
+                    document.getElementById("unitPrice").value = (revenue / sold).toFixed(2);
+                }
+            }
+        });
+
+
+
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,288 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  padding: 1rem 2rem;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #000;
+}
+
+.wallet-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+  min-width: 240px;
+}
+
+.wallet-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.wallet-row button,
+.wallet-row span {
+  white-space: nowrap;
+}
+
+.wallet-info button {
+  background-color: #000;
+  color: #fff;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.hero {
+  text-align: center;
+  padding: 2rem;
+}
+
+.hero h2 {
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+}
+
+.hero p {
+  color: #666;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.card {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 0.8rem;
+  max-width: 150px;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  margin: 0.3rem 0;
+}
+
+.card p {
+  font-weight: bold;
+  margin: 0.2rem 0 1rem;
+}
+
+.card button {
+  background-color: #000;
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  max-width: 150px;
+}
+
+.loader {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #ccc;
+  border-top-color: #000;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  header {
+	flex-direction: column;
+	align-items: flex-start;
+  }
+
+  .wallet-info {
+	align-items: flex-start;
+  }
+
+  header h1 {
+	font-size: 1.2rem;
+	margin-bottom: 0.5rem;
+  }
+}
+
+#nftOverlay {
+  display: none;
+  padding: 2rem;
+}
+
+#nftDetailView.modal {
+  background-color: #fff;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 2rem 1rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+  position: relative;
+}
+
+.modal {
+  background-color: #fff;
+  border-radius: 12px;
+  max-width: 600px;
+  width: 90%;
+  margin: 0 auto;
+  padding: 2rem 1rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  position: relative;
+}
+
+#nftDetailView img {
+  border-radius: 8px;
+  max-width: 150;
+}
+
+/* 关闭按钮依然固定在右上角 */
+.close-btn {
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.primary-button {
+  background-color: #000;
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.primary-button:hover {
+  background-color: #333;
+}
+
+/* 动画初始状态 */
+.view-container {
+  opacity: 0;
+  transform: translateX(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.view-container.active {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* 退出动画（可选） */
+.view-container.fade-out {
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.wallet-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wallet-dialog {
+  background: white;
+  padding: 20px 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+  font-size: 16px;
+}
+
+.spinner {
+  margin: 0 auto 10px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #4caf50;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0); }
+  100% { transform: rotate(360deg); }
+}
+
+.secondary-button {
+  background: #eee;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+}
+.secondary-button:hover {
+  background: #ddd;
+}
+
+.max-button {
+  padding: 8px 12px;
+  background: #f3f3f3;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.max-button:hover {
+  background: #e0e0e0;
+}
+
+input {
+  font-size: 16px;
+}

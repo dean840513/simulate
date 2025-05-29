@@ -1,0 +1,38 @@
+<div class="detail-page">
+    <div class="detail-header">
+        <h2>🧾 管理员分账模拟</h2>
+        <button onclick="window.showMain()" class="close-button">✖</button>
+    </div>
+
+    <div class="detail-body">
+        <p>请输入本月实际售出的酒 NFT 数量和单价或总收入：</p>
+        <input id="soldCount" type="number" placeholder="售出瓶数" style="width: 100%; margin-bottom: 10px;" />
+        <input id="unitPrice" type="number" placeholder="单价（USDT）" style="width: 100%; margin-bottom: 10px;" />
+        <input id="revenue" type="number" placeholder="总收入（USDT）" style="width: 100%; margin-bottom: 10px;" />
+        <button id="settleButton" class="primary-button">✅ 结算并分账</button>
+    </div>
+</div>
+
+<style>
+    .detail-page {
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        max-width: 500px;
+        margin: 20px auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .close-button {
+        font-size: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+</style>

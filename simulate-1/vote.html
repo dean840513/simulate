@@ -1,0 +1,114 @@
+<div class="detail-page">
+    <div class="detail-header">
+        <h2>🗳️ 酿酒投票</h2>
+        <button onclick="window.showMain()" class="close-button">✖</button>
+    </div>
+
+    <div class="detail-body">
+        <h3>🍷 选择酒类型</h3>
+        <div class="option-row" data-field="type">
+            <button class="option" data-value="干红葡萄酒">🍷 干红</button>
+            <button class="option" data-value="干白葡萄酒">🥂 干白</button>
+            <button class="option" data-value="起泡酒">🍾 起泡</button>
+            <button class="option" data-value="甜酒">🍯 甜酒</button>
+        </div>
+
+        <h3>🌍 选择国家</h3>
+        <div class="option-row" data-field="country">
+            <button class="option" data-value="中国">🇨🇳 中国</button>
+            <button class="option disabled">🇫🇷 法国（暂不可用）</button>
+            <button class="option disabled">🇮🇹 意大利（暂不可用）</button>
+        </div>
+
+        <h3>📍 选择产区</h3>
+        <div class="option-row" data-field="region">
+            <button class="option" data-value="山东">🌾 山东</button>
+            <button class="option" data-value="宁夏">🏞️ 宁夏</button>
+            <button class="option" data-value="新疆">🏜️ 新疆</button>
+            <button class="option" data-value="河北">🌿 河北</button>
+        </div>
+
+        <h3>🪵 橡木桶使用</h3>
+        <div class="option-row" data-field="oak">
+            <button class="option" data-value="新桶">🆕 新桶</button>
+            <button class="option" data-value="旧桶">🧓 旧桶</button>
+            <button class="option" data-value="不使用">🚫 不使用</button>
+        </div>
+
+        <h3>💰 期望售价</h3>
+        <div class="option-row" data-field="price">
+            <button class="option" data-value="100-500">💸 100-500 元</button>
+            <button class="option" data-value="500-1000">💸 500-1000 元</button>
+            <button class="option" data-value="1000-5000">💸 1000-5000 元</button>
+            <button class="option" data-value="5000+">💎 5000 元以上</button>
+        </div>
+
+        <h3 style="margin-top: 20px;">📝 你的选择</h3>
+        <ul id="voteSummary" style="line-height: 1.8;"></ul>
+
+        <h3 style="margin-top: 20px;">🔢 投票葡萄数量</h3>
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <input id="voteAmount" type="number" min="100" step="100" value="100" style="flex: 1; padding: 8px;" />
+            <button id="maxVote" class="max-button">Max</button>
+        </div>
+
+
+
+        <button id="voteButton" class="primary-button" style="margin-top: 20px;">✅ 确认投票</button>
+        <button onclick="window.showMain()" class="secondary-button">🏠 返回主页</button>
+    </div>
+    <p id="voteStatus" style="color: green; margin-top: 10px;"></p>
+</div>
+</div>
+
+<style>
+    .detail-page {
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        max-width: 500px;
+        margin: 20px auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .close-button {
+        font-size: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+
+    .option-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-bottom: 15px;
+    }
+
+    .option {
+        padding: 10px 16px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        background: #f9f9f9;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .option.active {
+        background: #4caf50;
+        color: white;
+        border-color: #4caf50;
+    }
+
+    .option.disabled {
+        background: #eee;
+        color: #999;
+        cursor: not-allowed;
+    }
+</style>

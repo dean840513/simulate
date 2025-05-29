@@ -1,0 +1,45 @@
+<div class="detail-page">
+    <div class="detail-header">
+        <h2>🍷 领取葡萄酒 NFT</h2>
+        <button onclick="window.showMain()" class="close-button">✖</button>
+    </div>
+
+    <div class="detail-body">
+        <p style="font-size: 14px; color: gray;">
+            NFT 合约地址：<span style="user-select: all;">0x1234567890abcdef1234567890abcdef12345678</span>
+        </p>
+        <p>每 100 颗锁定葡萄可兑换 1 瓶酒 NFT。</p>
+        <p>🔒 当前锁定的葡萄数量：<span id="lockedGrapes">0</span></p>
+        <button id="redeemButton" class="primary-button">立即领取</button>
+        <p id="redeemResult" style="color: green; margin-top: 10px;"></p>
+        <button onclick="window.showMain()" class="secondary-button">🏠 返回主页</button>
+
+        <h3 style="margin-top: 30px;">你已领取的酒 NFT：</h3>
+        <ul id="nftList" style="list-style-type: none; padding-left: 0;"></ul>
+    </div>
+</div>
+</div>
+
+<style>
+    .detail-page {
+        padding: 20px;
+        background: #fff;
+        border-radius: 12px;
+        max-width: 500px;
+        margin: 20px auto;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .close-button {
+        font-size: 20px;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+</style>
