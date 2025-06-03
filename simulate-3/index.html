@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Identity System</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header>
+    <h1>Welcome to TATTOO Wine</h1>
+    <div class="wallet-info">
+      <div class="wallet-row">
+        <button id="connectBtn" class="primary-button">🦊 MetaMask</button>
+        <button id="connectBtnMagic" class="primary-button">📧 Email</button>
+      </div>
+
+      <div class="wallet-row">
+        <span id="walletAddress" style="display:none; font-size:0.9rem; color:#333;"></span>
+      </div>
+
+      <div class="wallet-row">
+        <a href="javascript:void(0);" id="myRolesLink"
+          style="display:none; font-size:0.9rem; color:#333; text-decoration:none;">
+          🧑‍💼 My WineDIDs
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- NFT展示区域（标签切换 + 内容区） -->
+  <div id="mainPage" class="view-container" style="display:block; padding: 2rem;">
+    <div style="display: flex; gap: 2rem; align-items: center; flex-wrap: nowrap;">
+      <h2 id="tab-identity" style="cursor:pointer; color:#8B0000; margin: 0; transition: all 0.3s;"
+        onclick="switchToTab('identity')">🪪 Wine DIDs</h2>
+      <h2 id="tab-wine" style="cursor:pointer; color:#000; margin: 0; transition: all 0.3s;"
+        onclick="switchToTab('wine')">🍷 Wine NFTs</h2>
+    </div>
+
+    <div id="identityNFTView" class="view-container" style="margin-top: 1rem;">
+      <div id="identityNFTGrid" class="grid"></div>
+    </div>
+
+    <div id="wineNFTView" class="view-container" style="display:none; margin-top: 1rem;">
+      <div id="nftListView">
+        <div class="grid" id="nftGrid"></div>
+      </div>
+    </div>
+
+    <!-- ✅ 将详情页提出来，与 wineNFTView 平级 -->
+    <div id="nftOverlay" class="view-container" style="display: none; padding: 2rem;">
+      <div id="nftDetailView" class="modal" style="text-align: center;">
+        <button class="close-btn" onclick="backToList()">✖</button>
+        <h2 id="nftName"></h2>
+        <p id="nftDescription" style="color: #666; margin-bottom: 1rem;"></p>
+        <img id="nftImage" style="max-width: 300px; display: block; margin: 1rem auto;" />
+        <div id="nftAttributes" style="color: #666; font-size: 0.9rem; margin: 0.3rem 0;"></div>
+        <p id="nftPrice" style="font-weight: bold;"></p>
+        <button id="buyButton" class="primary-button" onclick="buyNFT()" style="display: none;">🛒 Buy Now</button>
+        <div id="paypal-button-container" style="margin-top: 1rem;"></div>
+      </div>
+    </div>
+
+
+    <!-- 付款成功提示 -->
+    <div id="paymentResult" style="display: none;"></div>
+  </div>
+  </div>
+
+  <!-- 我的身份页面 -->
+  <div id="myRolesView" class="view-container" style="display:none; padding: 2rem;">
+    <div class="modal">
+      <button class="close-btn" onclick="backToList()">✖</button>
+      <h2>🧑‍💼 My WineDIDs</h2>
+      <div id="myRoleGrid" class="grid"></div>
+    </div>
+  </div>
+
+  <!-- 钱包加载遮罩 -->
+  <div id="walletOverlay" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.4); z-index:10000; align-items:center; justify-content:center;">
+    <div style="display:flex; flex-direction:column; background:#fff; padding:1.2rem 2rem; border-radius:8px;
+      box-shadow:0 4px 12px rgba(0,0,0,0.2); font-size:1rem; text-align:center;">
+      <div class="loader" style="margin-bottom:1rem;"></div>
+      Processing, please wait...
+    </div>
+  </div>
+
+  <!-- DID 详情页 -->
+  <div id="didDetailView" class="view-container" style="display:none; padding: 2rem;">
+    <div class="modal">
+      <button class="close-btn" onclick="backToList()">✖</button>
+      <h2 id="didTitle">🪪 Role Detail</h2>
+      <p id="didDesc" style="color:#666; margin: 0.5rem 0;"></p>
+      <p id="didInfo" style="font-size: 0.9rem; color: #999;"></p>
+      <div id="didExtra" style="margin-top: 1rem; font-size: 0.95rem;"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script src="wine.js"></script>
+</body>
+
+</html>

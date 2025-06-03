@@ -1,0 +1,82 @@
+[
+  {
+    "tokenId": 1,
+    "name": "酒款 #1",
+    "description": "这是一款优质红酒 #1",
+    "image": "jpg/wine1.jpg",
+    "price": 41.15,
+    "stock": 1,
+    "status": 1,
+    "createdAt": 1716861000,
+    "attributes": [
+      {
+        "trait_type": "产区",
+        "value": "宁夏贺兰山"
+      },
+      {
+        "trait_type": "年份",
+        "value": "2021"
+      }
+    ]
+  },
+  {
+    "tokenId": 2,
+    "name": "酒款 #2",
+    "description": "这是一款优质红酒 #2",
+    "image": "jpg/wine2.jpg",
+    "price": 36.27,
+    "stock": 9,
+    "status": 1,
+    "createdAt": 1716862000,
+    "attributes": [
+      {
+        "trait_type": "产区",
+        "value": "宁夏贺兰山"
+      },
+      {
+        "trait_type": "年份",
+        "value": "2022"
+      }
+    ]
+  },
+  {
+    "tokenId": 3,
+    "name": "酒款 #3",
+    "description": "这是一款优质红酒 #3",
+    "image": "jpg/wine3.jpg",
+    "price": 12.76,
+    "stock": 3,
+    "status": 1,
+    "createdAt": 1716863000,
+    "attributes": [
+      {
+        "trait_type": "产区",
+        "value": "宁夏贺兰山"
+      },
+      {
+        "trait_type": "年份",
+        "value": "2020"
+      }
+    ]
+  },
+  {
+    "tokenId": 4,
+    "name": "酒款 #4",
+    "description": "这是一款优质红酒 #4",
+    "image": "jpg/wine4.jpg",
+    "price": 19.61,
+    "stock": 16,
+    "status": 1,
+    "createdAt": 1716864000,
+    "attributes": [
+      {
+        "trait_type": "产区",
+        "value": "宁夏贺兰山"
+      },
+      {
+        "trait_type": "年份",
+        "value": "2021"
+      }
+    ]
+  }
+]
