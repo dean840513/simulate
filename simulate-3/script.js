@@ -1,11 +1,8 @@
 // ========== 模拟钱包连接 ==========
 function generateRandomAddress() {
-  const chars = 'abcdef0123456789';
-  let address = '0x';
-  for (let i = 0; i < 40; i++) {
-    address += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return address;
+  const bytes = new Uint8Array(20); // 20 bytes = 40 hex characters
+  crypto.getRandomValues(bytes);
+  return '0x' + Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
 let currentUserAddress = null;
@@ -16,7 +13,6 @@ function getLocalUser() {
 
 function setLocalUser(addr) {
   currentUserAddress = addr;
-  localStorage.setItem("userAddress", addr);
 
   document.getElementById("walletAddress").style.display = "inline";
   document.getElementById("walletAddress").innerText = "Address: " + addr;
@@ -24,13 +20,24 @@ function setLocalUser(addr) {
   document.getElementById("connectBtnMagic").style.display = "none";
 
   document.getElementById("myRolesLink").style.display = "inline";
-  document.getElementById("myRolesLink").onclick = showMyRoles;
+  document.getElementById("myCellarLink").style.display = "inline";
+  document.getElementById("myOrderLink").style.display = "inline";
+  document.getElementById("clearDataLink").style.display = "inline";
+
+  // ✅ 登录后重新渲染 PayPal（如果当前处于 DID 详情页）
+  // if (currentViewId === "didDetailView" && window._pendingRoleDetail) {
+  //   renderPaypalButton("paypal-did-container", window._pendingRoleDetail.price, () => {
+  //     purchaseNFT(window._pendingRoleDetail.roleId);
+  //     showPaymentSuccess("did");
+  //   });
+  // }
 }
 
 function connectWallet() {
   const cached = localStorage.getItem("userAddress");
   if (cached) return setLocalUser(cached);
   const addr = generateRandomAddress();
+  localStorage.setItem("userAddress", addr);
   setLocalUser(addr);
 }
 
@@ -49,14 +56,49 @@ function connectWithMagic() {
 
 // ========== 身份 NFT 列表 ==========
 const IDENTITY_NFTS = [
-  { key: "winery", name: "🍇 Winery", desc: "Can publish wine listings", address: "0xABC123...", tokenId: 1, price: 49.99 },
-  { key: "dao", name: "🧠 DAO Member", desc: "Vote on proposals", address: "0xDEF456...", tokenId: 2, price: 39.99 },
-  { key: "investor", name: "💰 Investor", desc: "Receive platform dividends", address: "0xINV789...", tokenId: 3, price: 59.99 },
-  { key: "founder", name: "🧑‍💼 Founder", desc: "Platform governance control", address: "0xFND999...", tokenId: 4, price: 99.99 },
-  { key: "promoter", name: "📣 Promoter", desc: "Invite users and earn rewards", address: "0xPROMO88...", tokenId: 5, price: 29.99 },
-  { key: "writer", name: "✍️ Writer", desc: "Publish articles and reviews", address: "0xWRITE55...", tokenId: 6, price: 24.99 }
+  {
+    roleId: "winery001",
+    name: "🍇 Winery",
+    desc: "Can publish wine listings",
+    address: "0xABC123...",
+    price: 99
+  },
+  {
+    roleId: "dao001",
+    name: "🧠 DAO Member",
+    desc: "Vote on proposals",
+    address: "0xDEF456...",
+    price: 29
+  },
+  {
+    roleId: "investor001",
+    name: "💰 Investor",
+    desc: "Receive platform dividends",
+    address: "0xINV789...",
+    price: 199
+  },
+  {
+    roleId: "founder001",
+    name: "🧑‍💼 Founder",
+    desc: "Platform governance control",
+    address: "0xFND999...",
+    price: 299
+  },
+  {
+    roleId: "promoter001",
+    name: "📣 Promoter",
+    desc: "Invite users and earn rewards",
+    address: "0xPROMO88...",
+    price: 49
+  },
+  {
+    roleId: "writer001",
+    name: "✍️ Writer",
+    desc: "Publish articles and reviews",
+    address: "0xWRITE55...",
+    price: 39
+  }
 ];
-
 
 function switchToTab(tab) {
   // 切换内容区域视图
@@ -94,16 +136,15 @@ function showIdentityNFTs() {
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = function () {
-      enterDidDetail(nft.key);
+      enterDidDetail(nft.roleId);
     };
     card.innerHTML = `
       <h3>${nft.name}</h3>
       <p style="font-size:0.9rem; color:#666;">${nft.desc}</p>
       <p style="font-size:0.85rem; color:#999;">
         Contract Address: <code>${nft.address}</code><br>
-        Token ID: ${nft.tokenId}
       </p>
-      <button class="primary-button" onclick="enterDidDetail('${nft.key}')">➡️ Detail</button>
+      <button class="primary-button ">➡️ Detail</button>
     `;
     container.appendChild(card);
   });
@@ -112,23 +153,32 @@ function showIdentityNFTs() {
 }
 
 // 模拟购买身份 NFT
-function purchaseNFT(roleKey) {
+function purchaseNFT() {
   const user = getLocalUser();
+  const role = window._pendingRoleDetail;
   if (!user) return alert("Please connect your wallet first");
 
-  const key = `roles_${user}`;
-  let roles = JSON.parse(localStorage.getItem(key) || "[]");
+  // const alreadyOwned = roles.some(r => r.roleId === roleId);
+  // if (alreadyOwned) {
+  //   alert("You already own this role NFT.");
+  //   return;
+  // }  
 
-  if (roles.includes(roleKey)) {
-    alert("You already own this role NFT.");
-    return;
-  }
+  const container = document.getElementById("paypal-did-container");
+  container.innerHTML = "<p>Loading PayPal...</p>";
+  setTimeout(() => {
+    renderPaypalButton("paypal-did-container", role.price, () => {
+      const key = `roles_${user}`;
+      let roles = JSON.parse(localStorage.getItem(key) || "[]");
+      // ✅ 生成模拟 tokenId（示例规则：地址后4位 + 时间戳末4位）
+      const tokenId = `${user.slice(-4)}${Date.now() % 10000}`;
 
-  roles.push(roleKey);
-  localStorage.setItem(key, JSON.stringify(roles));
+      roles.push({ roleId: role.roleId, tokenId });
+      localStorage.setItem(key, JSON.stringify(roles));
 
-  alert("✅ Purchase successful! Role NFT added.");
-  showIdentityNFTs();
+      showPaymentSuccess("did");
+    });
+  }, 200);
 }
 
 // ========== 展示用户已拥有身份 ==========
@@ -142,29 +192,40 @@ function showMyRoles() {
   const key = `roles_${user}`;
   const roles = JSON.parse(localStorage.getItem(key) || "[]");
 
-  IDENTITY_NFTS.forEach(role => {
-    if (!roles.includes(role.key)) return;
+  let hasAny = false;
+
+  roles.forEach(entry => {
+    const role = IDENTITY_NFTS.find(r => r.roleId === entry.roleId);
+    if (!role) return;
+
+    hasAny = true;
+
     const card = document.createElement("div");
     card.className = "card";
     card.innerHTML = `
-      <h3>${role.name}</h3>
-      <p style="font-size:0.9rem; color:#666;">${role.desc}</p>
-      <p style="font-size:0.85rem; color:#999;">
-        Contract Address: <code>${role.address}</code><br>
-        Token ID: ${role.tokenId}
-      </p>
-      <button class="primary-button" onclick="enterRole('${role.key}')">➡️ Enter</button>
-    `;
+        <h3>${role.name}</h3>
+        <p style="font-size:0.9rem; color:#666;">${role.desc}</p>
+        <p style="font-size:0.85rem; color:#999;">
+          Contract Address: <code>${role.address}</code><br>
+          Token ID: ${entry.tokenId}
+        </p>
+        <button class="primary-button" onclick="enterRole('${role.roleId}')">➡️ Enter</button>
+      `;
     container.appendChild(card);
   });
+
+  if (!hasAny) {
+    container.innerHTML = "<p style='color:#666;'>🪪 You don't own any WineDIDs yet.</p>";
+  }
 
   hideMainPage();
   animateSwitchTo("myRolesView");
 }
 
+
 // 进入具体身份功能（待扩展）
 function enterRole(roleKey) {
-  const role = IDENTITY_NFTS.find(r => r.key === roleKey);
+  const role = IDENTITY_NFTS.find(r => r.roleId === roleKey);
   alert(`🔐 Entering ${role.name} dashboard (coming soon)`);
 }
 
@@ -174,9 +235,10 @@ function backToList() {
 
   const hash = location.hash;
   if (hash.startsWith("#nft")) {
-    history.replaceState(null, null, "#");
+    history.replaceState(null, null, "#nft");
     animateSwitchTo("wineNFTView");
   } else {
+    history.replaceState(null, null, "#identity");
     animateSwitchTo("identityNFTView");
   }
 }
@@ -197,10 +259,8 @@ let currentViewId = null; // 默认首页视图
 function animateSwitchTo(targetId) {
   if (targetId === currentViewId) return; // 已经是当前视图
 
-
-  console.log("currentid： " + currentViewId);
-  console.log("targetid： " + targetId);
-
+  // console.log("currentid： " + currentViewId);
+  // console.log("targetid： " + targetId);
 
   const fromEl = document.getElementById(currentViewId);
   const toEl = document.getElementById(targetId);
@@ -232,8 +292,40 @@ function animateSwitchTo(targetId) {
   }, 250);
 }
 
+function renderPaypalButton(containerId, price, onSuccess) {
+  const user = getLocalUser();
+  const container = document.getElementById(containerId);
+
+  // if (!user) {
+  //   container.innerHTML = "<p style='color:red;'>⚠️ Please connect your wallet first</p>";
+  //   return;
+  // }
+
+  if (!container) return console.error("PayPal container not found");
+  container.innerHTML = ""; // 清空旧按钮
+
+  console.log("paypal");
+  paypal.Buttons({
+    createOrder: (data, actions) => {
+      return actions.order.create({
+        purchase_units: [{ amount: { value: price.toString() } }]
+      });
+    },
+    onApprove: (data, actions) => {
+      return actions.order.capture().then(details => {
+        onSuccess();
+      });
+    },
+    onError: (err) => {
+      alert("PayPal Error: " + err);
+    }
+  }).render("#" + containerId);
+}
+
 function enterDidDetail(roleKey) {
-  const role = IDENTITY_NFTS.find(r => r.key === roleKey);
+  const role = IDENTITY_NFTS.find(r => r.roleId === roleKey);
+  const user = getLocalUser();
+  if (!user) return alert("Please connect your wallet first");
   if (!role) return alert("Role not found");
 
   document.getElementById("didTitle").innerText = role.name;
@@ -242,45 +334,181 @@ function enterDidDetail(roleKey) {
   // 显示完整合约地址和价格
   document.getElementById("didInfo").innerHTML = `
     Contract Address: <code>${role.address}</code><br>
-    Token ID: ${role.tokenId}<br>
     Price: <strong>$${role.price}</strong>
   `;
 
   let extraHTML = "";
-  if (role.key === "winery") {
+  if (role.roleId === "winery001") {
     extraHTML = "🍷 Wineries can publish wine listings on-chain.";
-  } else if (role.key === "dao") {
+  } else if (role.roleId === "dao001") {
     extraHTML = "🧠 DAO Members can vote and create proposals.";
-  } else if (role.key === "investor") {
+  } else if (role.roleId === "investor001") {
     extraHTML = "💰 Investors share revenue based on NFT holdings.";
-  } else if (role.key === "founder") {
+  } else if (role.roleId === "founder001") {
     extraHTML = "🧑‍💼 Founders can manage platform governance.";
-  } else if (role.key === "promoter") {
+  } else if (role.roleId === "promoter001") {
     extraHTML = "📣 Promoters earn rewards by inviting users.";
-  } else if (role.key === "writer") {
+  } else if (role.roleId === "writer001") {
     extraHTML = "✍️ Writers publish reviews and wine stories.";
   }
 
-  document.getElementById("didExtra").innerHTML = `
-    <p>${extraHTML}</p>
-    <button class="primary-button" onclick="purchaseNFT('${role.key}')">🛒 Purchase for $${role.price}</button>
-  `;
+  window._pendingRoleDetail = role;
+
+  document.getElementById("paypal-did-container").innerHTML = `
+      <button class="primary-button" onclick="purchaseNFT()">🛒 Purchase for $${role.price}</button>
+    `;
+
+  const hasOwned = user && JSON.parse(localStorage.getItem(`roles_${user}`) || "[]").some(r => r.roleId === role.roleId);
+  if (hasOwned) {
+    document.getElementById("paypal-did-container").innerHTML = `<p style="color:#666;">✅ You already own this DID.</p>`;
+  }
 
   animateSwitchTo("didDetailView");
+
+  // ✅ 保存当前 role 用于全局引用（推荐）
+}
+
+// 显示我的酒架
+function showMyCellar() {
+  const user = getLocalUser();
+  if (!user) return alert("Please connect your wallet first");
+
+  const txKey = `cellar_tx_${user}`;
+  const records = JSON.parse(localStorage.getItem(txKey) || "[]");
+
+  const container = document.getElementById("cellarGrid");
+  container.innerHTML = "";
+
+  if (records.length === 0) {
+    container.innerHTML = "<p style='color:#666;'>🕳️ Your wine cellar is empty.</p>";
+    hideMainPage();
+    animateSwitchTo("myCellarView");
+    return;
+  }
+
+  // 聚合每个 productId 的总数量
+  const summary = {};
+  records.forEach(tx => {
+    if (tx.txType !== "BUY") return; // 可拓展处理其他类型
+    summary[tx.productId] = (summary[tx.productId] || 0) + tx.quantity;
+  });
+
+  fetch("listings.json").then(res => res.json()).then(data => {
+    Object.keys(summary).forEach(pid => {
+      const wine = data.find(w => w.productId == pid);
+      if (!wine) return;
+
+      const quantity = summary[pid];
+      const lastPurchase = records.filter(r => r.productId == pid).slice(-1)[0];
+      const dateStr = new Date(lastPurchase.timestamp).toLocaleString();
+
+      const card = document.createElement("div");
+      card.className = "card";
+      card.onclick = () => showDetail(wine.productId);
+      card.innerHTML = `
+        <img src="${wine.image}" style="height: 200px; object-fit: contain; display: block; margin: 0 auto; border-radius:8px;" />
+        <h3>${wine.name}</h3>
+        <p style="font-size:0.9rem; color:#666;">${wine.description}</p>
+        <p style="font-size:0.85rem; color:#999;">🕒 Last purchase: ${dateStr}</p>
+        <p style="font-size:0.85rem; color:#999;">
+          Contract: <code>${wine.contract}</code><br>
+          Token ID: ${wine.tokenId}<br>
+          Quantity: ${quantity}
+        </p>
+        <p style="font-weight:bold;">Price: $${wine.price}</p>
+      `;
+      container.appendChild(card);
+    });
+
+    hideMainPage();
+    animateSwitchTo("myCellarView");
+  });
+}
+
+document.getElementById("clearDataLink").onclick = function () {
+  if (confirm("Are you sure you want to clear all test data?")) {
+    localStorage.clear();
+    alert("✅ All local test data cleared.\nPlease refresh the page.");
+  }
+};
+
+// 显示我的订单
+function showMyOrders() {
+  const user = getLocalUser();
+  if (!user) return alert("Please connect your wallet first");
+
+  const key = `cellar_tx_${user}`;
+  const orders = JSON.parse(localStorage.getItem(key) || "[]").filter(o => o.txType === "BUY");
+
+  const container = document.getElementById("ordersGrid");
+  container.innerHTML = "";
+
+  if (orders.length === 0) {
+    container.innerHTML = "<p style='color:#666;'>📭 You have no orders yet.</p>";
+    hideMainPage();
+    animateSwitchTo("myOrdersView");
+    return;
+  }
+
+  fetch("listings.json").then(res => res.json()).then(data => {
+    const list = document.createElement("ul");
+    list.style.listStyle = "none";
+    list.style.padding = "0";
+
+    orders.reverse().forEach(order => {
+      const wine = data.find(w => w.productId == order.productId);
+      if (!wine) return;
+
+      const dateStr = new Date(order.timestamp).toLocaleString();
+
+      const li = document.createElement("li");
+      li.style.borderBottom = "1px solid #eee";
+      li.style.padding = "0.5rem 0";
+
+      li.innerHTML = `
+        <strong>${wine.name}</strong> × ${order.quantity}  
+        <span style="color:#666; font-size: 0.9rem;"> | 🕒 ${dateStr}</span>  
+        <span style="float:right; color:#999;">$${(wine.price * order.quantity).toFixed(2)}</span>
+      `;
+
+      list.appendChild(li);
+    });
+
+    container.appendChild(list);
+    hideMainPage();
+    animateSwitchTo("myOrdersView");
+  });
 }
 
 
+function showPaymentSuccess(type) {
+  hideMainPage();
+  const msg = document.getElementById("successMessage");
+  if (type === "wine") {
+    msg.innerText = "🍷 You have successfully purchased a wine NFT!";
+  } else if (type === "did") {
+    msg.innerText = "🪪 You have successfully purchased a Wine DID!";
+  } else {
+    msg.innerText = "🎉 Purchase completed!";
+  }
 
+  // 控制按钮显示
+  document.getElementById("cellarBtn").style.display = type === "wine" ? "inline-block" : "none";
+  document.getElementById("didBtn").style.display = type === "did" ? "inline-block" : "none";
+
+  animateSwitchTo("paymentResult");
+}
 
 // ========== 初始化 ==========
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("connectBtn").onclick = connectWallet;
   document.getElementById("connectBtnMagic").onclick = connectWithMagic;
+  document.getElementById("myCellarLink").onclick = showMyCellar;
+  document.getElementById("myRolesLink").onclick = showMyRoles;
+  document.getElementById("myOrderLink").onclick = showMyOrders;
 
   showIdentityNFTs();
   loadWineNFTs();
-
-
 
   // 若URL带 hash 自动打开详情
   const hash = location.hash;

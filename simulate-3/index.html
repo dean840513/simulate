@@ -26,6 +26,18 @@
           style="display:none; font-size:0.9rem; color:#333; text-decoration:none;">
           🧑‍💼 My WineDIDs
         </a>
+        <a href="javascript:void(0);" id="myCellarLink"
+          style="display:none; font-size:0.9rem; color:#333; text-decoration:none;">
+          📦 My Wine Cellar
+        </a>
+        <a href="javascript:void(0);" id="myOrderLink"
+          style="display:none; font-size:0.9rem; color:#333; text-decoration:none;">
+          🧾 My Orders
+        </a>        
+        <a href="javascript:void(0);" id="clearDataLink"
+          style="display:none; font-size:0.9rem; color:red; text-decoration:none;">
+          🧹 Clear Test Data
+        </a>
       </div>
     </div>
   </header>
@@ -58,15 +70,26 @@
         <img id="nftImage" style="max-width: 300px; display: block; margin: 1rem auto;" />
         <div id="nftAttributes" style="color: #666; font-size: 0.9rem; margin: 0.3rem 0;"></div>
         <p id="nftPrice" style="font-weight: bold;"></p>
+        <label style="margin-top:1rem; display:block;">
+          Quantity: <input type="number" id="buyQuantity" value="1" min="1" style="width: 60px; padding: 0.25rem;" />
+        </label>
         <button id="buyButton" class="primary-button" onclick="buyNFT()" style="display: none;">🛒 Buy Now</button>
         <div id="paypal-button-container" style="margin-top: 1rem;"></div>
       </div>
     </div>
-
-
-    <!-- 付款成功提示 -->
-    <div id="paymentResult" style="display: none;"></div>
   </div>
+
+  <!-- 付款成功提示 -->
+  <div id="paymentResult" class="view-container" style="display: none; padding: 2rem; text-align: center;">
+    <div class="modal">
+      <h2>✅ Purchase Successful!</h2>
+      <p id="successMessage" style="margin: 1rem 0; font-size: 1rem; color: #555;"></p>
+      <div style="margin-top: 2rem; display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+        <button id="cellarBtn" class="primary-button" onclick="showMyCellar()">📦 My Wine Cellar</button>
+        <button id="didBtn" class="primary-button" onclick="showMyRoles()">🧑‍💼 My WineDIDs</button>
+        <button class="primary-button" onclick="backToList()">🏠 Back to Home</button>
+      </div>
+    </div>
   </div>
 
   <!-- 我的身份页面 -->
@@ -75,6 +98,24 @@
       <button class="close-btn" onclick="backToList()">✖</button>
       <h2>🧑‍💼 My WineDIDs</h2>
       <div id="myRoleGrid" class="grid"></div>
+    </div>
+  </div>
+
+  <!-- 我的酒架页面 -->
+  <div id="myCellarView" class="view-container" style="display:none; padding: 2rem;">
+    <div class="modal">
+      <button class="close-btn" onclick="backToList()">✖</button>
+      <h2>📦 My Wine Cellar</h2>
+      <div id="cellarGrid" class="grid"></div>
+    </div>
+  </div>
+
+  <!-- 我的订单页面 -->
+  <div id="myOrdersView" class="view-container" style="display:none; padding: 2rem;">
+    <div class="modal">
+      <button class="close-btn" onclick="backToList()">✖</button>
+      <h2>📑 My Orders</h2>
+      <div id="ordersGrid" class="grid"></div>
     </div>
   </div>
 
@@ -96,9 +137,12 @@
       <p id="didDesc" style="color:#666; margin: 0.5rem 0;"></p>
       <p id="didInfo" style="font-size: 0.9rem; color: #999;"></p>
       <div id="didExtra" style="margin-top: 1rem; font-size: 0.95rem;"></div>
+      <div id="paypal-did-container"></div>
     </div>
   </div>
 
+
+  <script src="https://www.paypal.com/sdk/js?client-id=AXPx0x_9Nj4Nv0n-5u78lG0LU2mw32nU4u74j1iRdMTckF48neEdqWCrLMe-Vrd51Lj-jBpw-ltBQPRE&currency=USD"></script>
   <script src="script.js"></script>
   <script src="wine.js"></script>
 </body>
