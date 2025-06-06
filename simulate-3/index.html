@@ -62,18 +62,18 @@
     </div>
 
     <!-- ✅ 将详情页提出来，与 wineNFTView 平级 -->
-    <div id="nftOverlay" class="view-container" style="display: none; padding: 2rem;">
-      <div id="nftDetailView" class="modal" style="text-align: center;">
+    <div id="nftDetailView" class="view-container" style="display: none; padding: 2rem; text-align: center;">
+      <div class="modal">
         <button class="close-btn" onclick="backToList()">✖</button>
         <h2 id="nftName"></h2>
         <p id="nftDescription" style="color: #666; margin-bottom: 1rem;"></p>
-        <img id="nftImage" style="max-width: 300px; display: block; margin: 1rem auto;" />
+        <img id="nftImage" style="max-width: 100%; max-height: 300px; display: block; margin: 1rem auto;" />
         <div id="nftAttributes" style="color: #666; font-size: 0.9rem; margin: 0.3rem 0;"></div>
         <p id="nftPrice" style="font-weight: bold;"></p>
         <label style="margin-top:1rem; display:block;">
-          Quantity: <input type="number" id="buyQuantity" value="1" min="1" style="width: 60px; padding: 0.25rem;" />
+          Quantity: <input type="number" id="buyQuantity" value="1" min="1" style="width: 60px; padding: 0.25rem; font-size: 16px;" />
         </label>
-        <button id="buyButton" class="primary-button" onclick="buyNFT()" style="display: none;">🛒 Buy Now</button>
+        <button id="buyButton" class="primary-button" onclick="buyNFT()" style="display: none; margin-top: 1rem;">🛒 Buy Now</button>
         <div id="paypal-button-container" style="margin-top: 1rem;"></div>
       </div>
     </div>

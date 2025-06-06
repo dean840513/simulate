@@ -149,7 +149,8 @@ function showIdentityNFTs() {
     container.appendChild(card);
   });
 
-  backToList();
+  // backToList();
+  // animateSwitchTo("identityNFTView");
 }
 
 // 模拟购买身份 NFT
@@ -507,13 +508,21 @@ window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("myRolesLink").onclick = showMyRoles;
   document.getElementById("myOrderLink").onclick = showMyOrders;
 
+  animateSwitchTo("mainPage");
   showIdentityNFTs();
   loadWineNFTs();
 
   // 若URL带 hash 自动打开详情
   const hash = location.hash;
+
   if (hash.startsWith("#nft")) {
+    switchToTab("wine"); // ✅ 设置标签高亮
     const match = hash.match(/^#nft\/(\d+)/);
-    if (match) showDetail(match[1]);
+    if (match) {
+      // ✅ 等待列表加载完成后再展示详情，避免冲突
+      setTimeout(() => showDetail(match[1]), 300);
+    }
+  } else {
+    switchToTab("identity");
   }
 });

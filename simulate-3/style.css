@@ -78,6 +78,14 @@ h2 {
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
 }
 
+/* ✅ 手机视图下让 modal 撑满屏幕边缘 */
+@media (max-width: 600px) {
+  .modal {
+    max-width: 95vw;
+    padding: 1rem;
+  }
+}
+
 /* ========== 关闭按钮 ========== */
 
 .close-btn {
@@ -110,3 +118,6 @@ h2 {
   transform: translateY(20px) !important;
   pointer-events: none !important;
 }
+
+
+
