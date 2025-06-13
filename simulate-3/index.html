@@ -33,7 +33,7 @@
         <a href="javascript:void(0);" id="myOrderLink"
           style="display:none; font-size:0.9rem; color:#333; text-decoration:none;">
           🧾 My Orders
-        </a>        
+        </a>
         <a href="javascript:void(0);" id="clearDataLink"
           style="display:none; font-size:0.9rem; color:red; text-decoration:none;">
           🧹 Clear Test Data
@@ -71,9 +71,11 @@
         <div id="nftAttributes" style="color: #666; font-size: 0.9rem; margin: 0.3rem 0;"></div>
         <p id="nftPrice" style="font-weight: bold;"></p>
         <label style="margin-top:1rem; display:block;">
-          Quantity: <input type="number" id="buyQuantity" value="1" min="1" style="width: 60px; padding: 0.25rem; font-size: 16px;" />
+          Quantity: <input type="number" id="buyQuantity" value="1" min="1"
+            style="width: 60px; padding: 0.25rem; font-size: 16px;" />
         </label>
-        <button id="buyButton" class="primary-button" onclick="buyNFT()" style="display: none; margin-top: 1rem;">🛒 Buy Now</button>
+        <button id="buyButton" class="primary-button" onclick="buyNFT()" style="display: none; margin-top: 1rem;">🛒 Buy
+          Now</button>
         <div id="paypal-button-container" style="margin-top: 1rem;"></div>
       </div>
     </div>
@@ -141,8 +143,29 @@
     </div>
   </div>
 
+  <!-- Winery 功能页面 -->
+  <div id="wineryView" class="view-container" style="display:none; padding:2rem;">
+    <div class="modal">
+      <button class="close-btn" onclick="goBack()">✖</button>
+      <h2>🏭 Winery Dashboard</h2>
+      <div id="wineryForm"></div>
+      <div id="wineryList" style="margin-top:1rem;"></div>
+    </div>
+  </div>
 
-  <script src="https://www.paypal.com/sdk/js?client-id=AXPx0x_9Nj4Nv0n-5u78lG0LU2mw32nU4u74j1iRdMTckF48neEdqWCrLMe-Vrd51Lj-jBpw-ltBQPRE&currency=USD"></script>
+  <!-- DAO 功能页 -->
+<div id="daoView" class="view-container" style="display:none; padding:2rem;">
+  <div class="modal">
+    <button class="close-btn" onclick="goBack()">↩️ Back</button>
+    <h2>🧠 DAO Proposal System</h2>
+    <div id="daoForm"></div>
+    <div id="daoList" style="margin-top:1rem;"></div>
+  </div>
+</div>
+
+
+  <script
+    src="https://www.paypal.com/sdk/js?client-id=AXPx0x_9Nj4Nv0n-5u78lG0LU2mw32nU4u74j1iRdMTckF48neEdqWCrLMe-Vrd51Lj-jBpw-ltBQPRE&currency=USD"></script>
   <script src="script.js"></script>
   <script src="wine.js"></script>
 </body>

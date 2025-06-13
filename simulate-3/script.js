@@ -6,6 +6,7 @@ function generateRandomAddress() {
 }
 
 let currentUserAddress = null;
+let viewStack = [];
 
 function getLocalUser() {
   return currentUserAddress;
@@ -226,8 +227,15 @@ function showMyRoles() {
 
 // 进入具体身份功能（待扩展）
 function enterRole(roleKey) {
-  const role = IDENTITY_NFTS.find(r => r.roleId === roleKey);
-  alert(`🔐 Entering ${role.name} dashboard (coming soon)`);
+  if (roleKey === "winery001") {
+    location.hash = "#identity/" + roleKey;
+    import('./winery.js').then(m => m.showWineryDashboard());
+  } else if (roleKey === "dao001") {
+    location.hash = "#identity/" + roleKey;
+    import('./dao.js').then(m => m.showDAODashboard());
+  } else {
+    alert(`🔐 Entering ${roleKey} dashboard (coming soon)`);
+  }
 }
 
 // 返回主视图
@@ -268,6 +276,9 @@ function animateSwitchTo(targetId) {
 
   if (!toEl) return;
 
+  // ✅ 记录栈：仅记录非 null 的当前视图
+  if (currentViewId) viewStack.push(currentViewId);
+
   // 渐隐当前视图
   if (fromEl) {
     fromEl.classList.remove("active");
@@ -292,6 +303,17 @@ function animateSwitchTo(targetId) {
     currentViewId = targetId;
   }, 250);
 }
+
+function goBack() {
+  if (viewStack.length === 0) {
+    animateSwitchTo("mainPage");
+    return;
+  }
+
+  const lastView = viewStack.pop();
+  animateSwitchTo(lastView);
+}
+
 
 function renderPaypalButton(containerId, price, onSuccess) {
   const user = getLocalUser();
